@@ -67,5 +67,5 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
 
-
+await DbSeeder.SembrarAdminAsync(app.Services);
 app.Run();
