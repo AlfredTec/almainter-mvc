@@ -29,3 +29,20 @@ body {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
   text-align: start;
 }
+
+
+
+/* Mobile-first: tamaño de letra y botones cómodos para el celular */
+html {
+    font-size: 16px;
+}
+
+.form-control,
+.form-select,
+.btn {
+    min-height: 44px;
+}
+
+.btn-sm {
+    min-height: 36px;
+}

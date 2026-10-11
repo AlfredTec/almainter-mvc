@@ -1,0 +1,26 @@
+{
+  "name": "almainter",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "css": "sass Styles/almainter.scss wwwroot/css/almainter.css --load-path=node_modules --style=compressed --quiet",
+    "css:watch": "sass Styles/almainter.scss wwwroot/css/almainter.css --load-path=node_modules --watch --quiet"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AlfredTec/almainter-mvc.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/AlfredTec/almainter-mvc/issues"
+  },
+  "homepage": "https://github.com/AlfredTec/almainter-mvc#readme",
+  "dependencies": {
+    "bootstrap": "^5.3.3",
+    "sass": "^1.105.1"
+  }
+}
