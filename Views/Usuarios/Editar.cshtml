@@ -1,0 +1,60 @@
+﻿@using AlmaInter.Models.Enums
+@model AlmaInter.Models.ViewModels.UsuarioEditarViewModel
+@{
+    ViewData["Title"] = "Editar usuario";
+}
+
+<div class="row justify-content-center">
+    <div class="col-12 col-md-8 col-lg-6">
+        <h1 class="h3 mb-3">Editar usuario</h1>
+
+        <form asp-action="Editar" method="post" class="card card-body shadow-sm">
+            <input type="hidden" asp-for="Id" />
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
+
+            <div class="mb-3">
+                <label class="form-label">Usuario</label>
+                <input class="form-control" value="@Model.Username" disabled />
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="NombreCompleto" class="form-label"></label>
+                <input asp-for="NombreCompleto" class="form-control" autocomplete="off" />
+                <span asp-validation-for="NombreCompleto" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Rol" class="form-label"></label>
+                <select asp-for="Rol" asp-items="Html.GetEnumSelectList<RolUsuario>()" class="form-select"></select>
+            </div>
+
+            <div class="form-check form-switch mb-4">
+                <input asp-for="Activo" class="form-check-input" role="switch" />
+                <label asp-for="Activo" class="form-check-label"></label>
+            </div>
+
+            <h2 class="h6 text-secondary">Restablecer contraseña</h2>
+
+            <div class="mb-3">
+                <label asp-for="NuevaPassword" class="form-label"></label>
+                <input asp-for="NuevaPassword" class="form-control" autocomplete="new-password" />
+                <span asp-validation-for="NuevaPassword" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="ConfirmarNuevaPassword" class="form-label"></label>
+                <input asp-for="ConfirmarNuevaPassword" class="form-control" autocomplete="new-password" />
+                <span asp-validation-for="ConfirmarNuevaPassword" class="text-danger"></span>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Guardar cambios</button>
+                <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

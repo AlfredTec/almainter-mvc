@@ -19,6 +19,13 @@ $theme-colors: map-merge(
   )
 );
 
+// Tipografía de AlmaInter
+$font-family-sans-serif: "Albert Sans", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif;
+$font-heading: "Chakra Petch", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+$headings-font-family: $font-heading;
+$headings-font-weight: 600;
+
 @import "bootstrap/scss/maps";
 @import "bootstrap/scss/mixins";
 @import "bootstrap/scss/utilities";
@@ -54,4 +61,6 @@ $theme-colors: map-merge(
 @import "bootstrap/scss/offcanvas";
 @import "bootstrap/scss/placeholders";
 @import "bootstrap/scss/helpers";
+// Utilidad nueva: .font-heading
+$utilities: map-merge( $utilities, ( "font-heading": ( property: font-family, class: font, values: (heading: $font-heading) ) ) );
 @import "bootstrap/scss/utilities/api";

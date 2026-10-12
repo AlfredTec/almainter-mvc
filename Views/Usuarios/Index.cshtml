@@ -1,0 +1,37 @@
+﻿@model IEnumerable<AlmaInter.Models.ViewModels.UsuarioListItemViewModel>
+@{
+    ViewData["Title"] = "Usuarios";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">Usuarios</h1>
+    <a asp-action="Crear" class="btn btn-primary">Nuevo usuario</a>
+</div>
+
+@if (TempData["Mensaje"] is string mensaje)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @mensaje
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+    </div>
+}
+
+<div class="list-group shadow-sm">
+    @foreach (var u in Model)
+    {
+        <a asp-action="Editar" asp-route-id="@u.Id"
+           class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+            <div>
+                <div class="fw-semibold">@u.NombreCompleto</div>
+                <div class="small text-secondary">@u.Username</div>
+            </div>
+            <div class="text-end">
+                <span class="badge text-bg-accent">@u.Rol</span>
+                @if (!u.Activo)
+                {
+                    <span class="badge text-bg-secondary">Inactivo</span>
+                }
+            </div>
+        </a>
+    }
+</div>

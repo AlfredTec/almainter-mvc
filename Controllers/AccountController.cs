@@ -34,8 +34,8 @@ namespace AlmaInter.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
-            var username = model.Username.Trim();
-            var usuario = await db.Usuarios.FirstOrDefaultAsync(u => u.Username == username);
+            var username = model.Username.Trim().ToLowerInvariant();
+            var usuario = await db.Usuarios.FirstOrDefaultAsync(u => u.Username.ToLower() == username);
 
             var credencialesValidas = false;
             if (usuario is not null && usuario.Activo)
