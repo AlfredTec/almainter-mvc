@@ -1,0 +1,85 @@
+﻿@model IEnumerable<AlmaInter.Models.ViewModels.ArticuloListItemViewModel>
+@{
+    ViewData["Title"] = "Artículos";
+    var esAdmin = User.IsInRole("Admin");
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">Artículos</h1>
+    @if (esAdmin)
+    {
+        <a asp-action="Crear" class="btn btn-primary">Nuevo artículo</a>
+    }
+</div>
+
+@if (TempData["Mensaje"] is string mensaje)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @mensaje
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+    </div>
+}
+@if (TempData["Error"] is string error)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @error
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+    </div>
+}
+
+<form method="get" class="mb-3">
+    <div class="input-group">
+        <input type="search" name="q" value="@ViewData["q"]" class="form-control"
+               placeholder="Buscar por nombre, ubicación o descripción" />
+        <button class="btn btn-primary" type="submit">Buscar</button>
+    </div>
+</form>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-secondary">No se encontraron artículos.</div>
+}
+else
+{
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-3">
+        @foreach (var a in Model)
+        {
+            <div class="col">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start gap-2 mb-1">
+                            <h2 class="h5 card-title mb-0">@a.Nombre</h2>
+                            @if (a.CantidadCasa == 0)
+                            {
+                                <span class="badge text-bg-danger">Sin stock</span>
+                            }
+                            else
+                            {
+                                <span class="badge text-bg-brand">Stock: @a.CantidadCasa</span>
+                            }
+                        </div>
+                        <p class="small text-secondary mb-2">Ubicación: @a.UbicacionCasa</p>
+                        @if (!string.IsNullOrWhiteSpace(a.Descripcion))
+                        {
+                            <p class="card-text small mb-0">@a.Descripcion</p>
+                        }
+                    </div>
+                    @if (esAdmin)
+                    {
+                        <div class="card-footer bg-transparent d-flex justify-content-between align-items-center">
+                            @if (!a.Activo)
+                            {
+                                <span class="badge text-bg-secondary">Inactivo</span>
+                            }
+                            else
+                            {
+                                <span></span>
+                            }
+                            <a asp-action="Editar" asp-route-id="@a.Id" class="btn btn-outline-primary btn-sm">Editar</a>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+}

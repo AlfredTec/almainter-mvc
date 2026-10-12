@@ -1,0 +1,48 @@
+﻿@model AlmaInter.Models.ViewModels.ArticuloCrearViewModel
+@{
+    ViewData["Title"] = "Nuevo artículo";
+}
+
+<div class="row justify-content-center">
+    <div class="col-12 col-md-8 col-lg-6">
+        <h1 class="h3 mb-3">Nuevo artículo</h1>
+
+        <form asp-action="Crear" method="post" class="card card-body shadow-sm">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
+
+            <div class="mb-3">
+                <label asp-for="Nombre" class="form-label"></label>
+                <input asp-for="Nombre" class="form-control" autocomplete="off" autofocus />
+                <span asp-validation-for="Nombre" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="UbicacionCasa" class="form-label"></label>
+                <input asp-for="UbicacionCasa" class="form-control" autocomplete="off" />
+                <span asp-validation-for="UbicacionCasa" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Descripcion" class="form-label"></label>
+                <textarea asp-for="Descripcion" class="form-control" rows="3"></textarea>
+                <span asp-validation-for="Descripcion" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="CantidadInicial" class="form-label"></label>
+                <input asp-for="CantidadInicial" type="number" min="0" inputmode="numeric" class="form-control" />
+                <div class="form-text">Si es mayor que 0, se registra como una Entrada en el historial.</div>
+                <span asp-validation-for="CantidadInicial" class="text-danger"></span>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Guardar</button>
+                <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

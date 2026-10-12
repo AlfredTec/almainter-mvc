@@ -1,0 +1,95 @@
+﻿@model AlmaInter.Models.ViewModels.ArticuloEditarViewModel
+@{
+    ViewData["Title"] = "Editar artículo";
+}
+
+<div class="row justify-content-center">
+    <div class="col-12 col-md-8 col-lg-6">
+        <h1 class="h3 mb-3">Editar artículo</h1>
+
+        @if (TempData["Error"] is string error)
+        {
+            <div class="alert alert-danger">@error</div>
+        }
+
+        <form asp-action="Editar" method="post" class="card card-body shadow-sm">
+            <input type="hidden" asp-for="Id" />
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
+
+            <div class="mb-3">
+                <label asp-for="Nombre" class="form-label"></label>
+                <input asp-for="Nombre" class="form-control" autocomplete="off" />
+                <span asp-validation-for="Nombre" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="UbicacionCasa" class="form-label"></label>
+                <input asp-for="UbicacionCasa" class="form-control" autocomplete="off" />
+                <span asp-validation-for="UbicacionCasa" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Descripcion" class="form-label"></label>
+                <textarea asp-for="Descripcion" class="form-control" rows="3"></textarea>
+                <span asp-validation-for="Descripcion" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Stock actual en la casa</label>
+                <input class="form-control" value="@Model.CantidadCasa" disabled />
+                <div class="form-text">El stock cambia solo con Entradas y Salidas.</div>
+            </div>
+
+            <div class="form-check form-switch mb-4">
+                <input asp-for="Activo" class="form-check-input" role="switch" />
+                <label asp-for="Activo" class="form-check-label"></label>
+            </div>
+
+            <div class="d-flex flex-wrap gap-2">
+                <button type="submit" class="btn btn-primary">Guardar cambios</button>
+                <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
+                @if (!Model.TieneMovimientos)
+                {
+                    <button type="button" class="btn btn-outline-danger ms-md-auto"
+                            data-bs-toggle="modal" data-bs-target="#modalEliminar">
+                        Eliminar
+                    </button>
+                }
+            </div>
+
+            @if (Model.TieneMovimientos)
+            {
+                <div class="form-text mt-3">
+                    Este artículo tiene movimientos, por eso no se puede eliminar. Si ya no se usa, desactívalo.
+                </div>
+            }
+        </form>
+    </div>
+</div>
+
+@if (!Model.TieneMovimientos)
+{
+    <div class="modal fade" id="modalEliminar" tabindex="-1" aria-labelledby="modalEliminarTitulo" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title h5" id="modalEliminarTitulo">Eliminar artículo</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    ¿Seguro que quieres eliminar «@Model.Nombre»? Esta acción no se puede deshacer.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <form asp-action="Eliminar" asp-route-id="@Model.Id" method="post">
+                        <button type="submit" class="btn btn-danger">Sí, eliminar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
