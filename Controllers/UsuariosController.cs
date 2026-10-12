@@ -1,4 +1,5 @@
 ﻿using AlmaInter.Data;
+using AlmaInter.Services;
 using AlmaInter.Models.Entities;
 using AlmaInter.Models.Enums;
 using AlmaInter.Models.ViewModels;
@@ -6,13 +7,14 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using System.Security.Claims;
 
 namespace AlmaInter.Controllers
 {
 
     [Authorize(Policy = "SoloAdmin")]
-    public class UsuariosController(AppDbContext db, IPasswordHasher<Usuario> hasher) : Controller
+    public class UsuariosController(AppDbContext db, IPasswordHasher<Usuario> hasher, IMemoryCache cache) : Controller
     {
         public async Task<IActionResult> Index()
         {
@@ -115,6 +117,9 @@ namespace AlmaInter.Controllers
                 usuario.PasswordHash = hasher.HashPassword(usuario, model.NuevaPassword);
 
             await db.SaveChangesAsync();
+
+            // Invalidar el cache de la sesión del usuario
+            cache.Remove(SesionValidator.Clave(usuario.Id));
 
             TempData["Mensaje"] = $"Usuario «{usuario.Username}» actualizado correctamente";
             return RedirectToAction(nameof(Index));

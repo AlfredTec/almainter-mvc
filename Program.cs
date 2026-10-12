@@ -3,7 +3,7 @@ using AlmaInter.Models.Entities;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-
+using AlmaInter.Services;
 using AlmaInter.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,6 +20,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddScoped<IPasswordHasher<Usuario>, PasswordHasher<Usuario>>();
 
+builder.Services.AddMemoryCache();
 
 // Agregar servicios de autenticación y autorización
 builder.Services
@@ -34,6 +35,7 @@ builder.Services
         options.Cookie.SameSite = SameSiteMode.Lax;
         options.ExpireTimeSpan = TimeSpan.FromHours(8);
         options.SlidingExpiration = true;
+        options.Events.OnValidatePrincipal = SesionValidator.ValidarAsync;
     });
 
 builder.Services.AddAuthorizationBuilder()
