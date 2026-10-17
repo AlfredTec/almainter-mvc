@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http;
 
 namespace AlmaInter.Models.ViewModels
 {
@@ -21,5 +22,8 @@ namespace AlmaInter.Models.ViewModels
         [Range(0, 100000, ErrorMessage = "La cantidad debe estar entre 0 y 100000")]
         [Display(Name = "Stock inicial")]
         public int CantidadInicial { get; set; }
+
+        [Display(Name = "Foto")]
+        public IFormFile? Foto { get; set; }
     }
 }

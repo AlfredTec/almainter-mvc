@@ -22,5 +22,8 @@
   "dependencies": {
     "bootstrap": "^5.3.3",
     "sass": "^1.105.1"
+  },
+  "devDependencies": {
+    "eslint": "^10.12.0"
   }
 }

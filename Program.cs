@@ -44,6 +44,10 @@ builder.Services.AddAuthorizationBuilder()
         .RequireAuthenticatedUser()
         .Build());
 
+// Agregar servicios de Supabase
+builder.Services.Configure<SupabaseOptions>(builder.Configuration.GetSection(SupabaseOptions.Seccion));
+builder.Services.AddHttpClient<IStorageService, StorageService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

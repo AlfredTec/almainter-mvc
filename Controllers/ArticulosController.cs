@@ -2,6 +2,7 @@
 using AlmaInter.Models.Entities;
 using AlmaInter.Models.Enums;
 using AlmaInter.Models.ViewModels;
+using AlmaInter.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -11,8 +12,9 @@ using System.Security.Claims;
 namespace AlmaInter.Controllers
 {
     [Authorize]
-    public class ArticulosController(AppDbContext db) : Controller
+    public class ArticulosController(AppDbContext db, IStorageService storage) : Controller
     {
+        private const long TamanoMaximoFoto = 2 * 1024 * 1024; // 2 MB
         public async Task<IActionResult> Index(string? q)
         {
             var query = db.Articulos.AsNoTracking().AsQueryable();
@@ -57,6 +59,21 @@ namespace AlmaInter.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Crear(ArticuloCrearViewModel model)
         {
+            ValidarTamanoFoto(model.Foto);
+
+            string? urlImagen = null;
+            if (ModelState.IsValid && model.Foto is { Length: > 0 })
+            {
+                try
+                {
+                    urlImagen = await storage.SubirImagenAsync(model.Foto);
+                }
+                catch (InvalidOperationException ex)
+                {
+                    ModelState.AddModelError(nameof(model.Foto), ex.Message);
+                }
+            }
+
             if (!ModelState.IsValid)
                 return View(model);
 
@@ -66,6 +83,7 @@ namespace AlmaInter.Controllers
                 UbicacionCasa = model.UbicacionCasa.Trim(),
                 Descripcion = string.IsNullOrWhiteSpace(model.Descripcion) ? null : model.Descripcion.Trim(),
                 CantidadCasa = model.CantidadInicial,
+                ImagenUrl = urlImagen,
                 Activo = true
             };
             db.Articulos.Add(articulo);
@@ -82,9 +100,17 @@ namespace AlmaInter.Controllers
                 });
             }
 
-            await db.SaveChangesAsync();
+            try
+            {
+                await db.SaveChangesAsync();
+            }
+            catch
+            {
+                await storage.EliminarAsync(urlImagen); // no dejar una foto huérfana
+                throw;
+            }
 
-            TempData["Mensaje"] = $"Artículo {articulo.Nombre} creado correctamente";
+            TempData["Mensaje"] = $"Artículo «{articulo.Nombre}» creado correctamente";
             return RedirectToAction(nameof(Index));
         }
 
@@ -103,6 +129,7 @@ namespace AlmaInter.Controllers
                 UbicacionCasa = articulo.UbicacionCasa,
                 Descripcion = articulo.Descripcion,
                 Activo = articulo.Activo,
+                ImagenUrl = articulo.ImagenUrl,
                 CantidadCasa = articulo.CantidadCasa,
                 TieneMovimientos = await db.Movimientos.AnyAsync(m => m.ArticuloId == id)
             });
@@ -117,21 +144,56 @@ namespace AlmaInter.Controllers
             if (articulo is null)
                 return NotFound();
 
+            ValidarTamanoFoto(model.Foto);
+
+            string? urlNueva = null;
+            if (ModelState.IsValid && model.Foto is { Length: > 0 })
+            {
+                try
+                {
+                    urlNueva = await storage.SubirImagenAsync(model.Foto);
+                }
+                catch (InvalidOperationException ex)
+                {
+                    ModelState.AddModelError(nameof(model.Foto), ex.Message);
+                }
+            }
+
             if (!ModelState.IsValid)
             {
+                model.ImagenUrl = articulo.ImagenUrl;
                 model.CantidadCasa = articulo.CantidadCasa;
                 model.TieneMovimientos = await db.Movimientos.AnyAsync(m => m.ArticuloId == model.Id);
                 return View(model);
             }
+
+            var urlAnterior = articulo.ImagenUrl;
 
             articulo.Nombre = model.Nombre.Trim();
             articulo.UbicacionCasa = model.UbicacionCasa.Trim();
             articulo.Descripcion = string.IsNullOrWhiteSpace(model.Descripcion) ? null : model.Descripcion.Trim();
             articulo.Activo = model.Activo;
 
-            await db.SaveChangesAsync();
+            if (urlNueva is not null)
+                articulo.ImagenUrl = urlNueva;
+            else if (model.QuitarFoto)
+                articulo.ImagenUrl = null;
 
-            TempData["Mensaje"] = $"Artículo {articulo.Nombre} actualizado correctamente";
+            try
+            {
+                await db.SaveChangesAsync();
+            }
+            catch
+            {
+                await storage.EliminarAsync(urlNueva);
+                throw;
+            }
+
+            // Ya guardado: se borra la foto anterior si cambió
+            if (urlAnterior != articulo.ImagenUrl)
+                await storage.EliminarAsync(urlAnterior);
+
+            TempData["Mensaje"] = $"Artículo «{articulo.Nombre}» actualizado correctamente";
             return RedirectToAction(nameof(Index));
         }
 
@@ -150,14 +212,24 @@ namespace AlmaInter.Controllers
                 return RedirectToAction(nameof(Editar), new { id });
             }
 
+            var urlImagen = articulo.ImagenUrl;
+
             db.Articulos.Remove(articulo);
             await db.SaveChangesAsync();
+            await storage.EliminarAsync(urlImagen);
 
-            TempData["Mensaje"] = $"Artículo {articulo.Nombre} eliminado";
+            TempData["Mensaje"] = $"Artículo «{articulo.Nombre}» eliminado";
             return RedirectToAction(nameof(Index));
+        }
+
+        private void ValidarTamanoFoto(IFormFile? foto)
+        {
+            if (foto is { Length: > TamanoMaximoFoto })
+                ModelState.AddModelError("Foto", "La foto no puede pesar más de 2 MB");
         }
 
         private Guid ObtenerUsuarioId() =>
             Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
     }
 }

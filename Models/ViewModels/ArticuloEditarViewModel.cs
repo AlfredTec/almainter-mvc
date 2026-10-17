@@ -23,7 +23,14 @@ namespace AlmaInter.Models.ViewModels
         [Display(Name = "Artículo activo")]
         public bool Activo { get; set; }
 
+        [Display(Name = "Foto")]
+        public IFormFile? Foto { get; set; }
+
+        [Display(Name = "Quitar la foto actual")]
+        public bool QuitarFoto { get; set; }
+
         // Solo para mostrar; no se modifica desde aquí
+        public string? ImagenUrl { get; set; }
         public int CantidadCasa { get; set; }
         public bool TieneMovimientos { get; set; }
     }

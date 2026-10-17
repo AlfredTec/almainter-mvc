@@ -1,8 +1,8 @@
 ﻿@model AlmaInter.Models.ViewModels.ArticuloEditarViewModel
 @{
     ViewData["Title"] = "Editar artículo";
+    var tieneFoto = !string.IsNullOrWhiteSpace(Model.ImagenUrl);
 }
-
 <div class="row justify-content-center">
     <div class="col-12 col-md-8 col-lg-6">
         <h1 class="h3 mb-3">Editar artículo</h1>
@@ -12,7 +12,7 @@
             <div class="alert alert-danger">@error</div>
         }
 
-        <form asp-action="Editar" method="post" class="card card-body shadow-sm">
+        <form asp-action="Editar" method="post" enctype="multipart/form-data" class="card card-body shadow-sm">
             <input type="hidden" asp-for="Id" />
             <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
 
@@ -38,6 +38,31 @@
                 <label class="form-label">Stock actual en la casa</label>
                 <input class="form-control" value="@Model.CantidadCasa" disabled />
                 <div class="form-text">El stock cambia solo con Entradas y Salidas.</div>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Foto" class="form-label"></label>
+                @if (tieneFoto)
+                {
+                    <div>
+                        <img src="@Model.ImagenUrl" alt="Foto actual" class="img-thumbnail w-50 mb-2" />
+                    </div>
+                }
+                <input asp-for="Foto" type="file" accept="image/*" class="form-control" data-foto-input />
+                <div class="form-text">
+                    @(tieneFoto ? "Elige una foto para reemplazar la actual." : "Opcional.")
+                    Se reduce sola antes de enviarse.
+                </div>
+                <span asp-validation-for="Foto" class="text-danger"></span>
+                <img id="fotoVista" alt="Vista previa" class="img-thumbnail mt-2 w-50 d-none" />
+
+                @if (tieneFoto)
+                {
+                    <div class="form-check mt-2">
+                        <input asp-for="QuitarFoto" class="form-check-input" />
+                        <label asp-for="QuitarFoto" class="form-check-label"></label>
+                    </div>
+                }
             </div>
 
             <div class="form-check form-switch mb-4">
@@ -92,4 +117,5 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/foto-articulo.js" asp-append-version="true"></script>
 }
